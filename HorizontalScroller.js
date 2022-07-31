@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////
 // *** HORIZONTAL SCROLLER by Adrián Gubrica *** //
 ///////////////////////////////////////////////////
-/////////////////////// v1.0 //////////////////////
+/////////////////////// v1.1 //////////////////////
 
 //////////////////// Poznámky /////////////////////
 
@@ -16,8 +16,11 @@ export default class HorizontalScroller {
     this.speed = _options.speed
     this.ease = _options.ease
     this.cursor = _options.cursor
+    this.initialPosition = _options.initialPosition
 
     // Init
+
+    this.firstRunFlag = true
 
     if (this.selector) {
       this.setStyles(this.selector)
@@ -33,7 +36,7 @@ export default class HorizontalScroller {
     this.startX
     this.scrollLeft
     this.x
-    this.dist
+    this.dist = 0
   }
 
   setStyles(_selector) {
@@ -84,7 +87,13 @@ export default class HorizontalScroller {
   animationFrame() {
     this.dist *= this.ease
 
-    this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+    if (this.firstRunFlag) {
+      this.slider.scrollLeft = this.initialPosition
+      this.firstRunFlag = false
+    } else {
+      this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+    }
+
     window.requestAnimationFrame(this.animationFrame.bind(this))
   }
 
