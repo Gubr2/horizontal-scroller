@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.1 *** //
+// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.2 *** //
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
@@ -43,6 +43,8 @@ export default class HorizontalScroller {
     this.scrollLeft
     this.x
     this.dist = 0
+
+    this.mathvalue = 3.3908
   }
 
   setStyles(_selector) {
@@ -74,6 +76,8 @@ export default class HorizontalScroller {
         e.preventDefault()
         this.x = e.pageX || e.touches[0].pageX - this.slider.offsetLeft
         this.dist = (this.x - this.startX) / this.speed
+        this.bouncedist = (this.x - this.startX) / (this.speed * 1.5)
+
         // this.slider.scrollLeft = this.scrollLeft - this.dist
       }
       ;(() => {
@@ -92,18 +96,26 @@ export default class HorizontalScroller {
 
   animationFrame() {
     this.dist *= this.ease
+    this.bouncedist *= this.ease
 
+    // For the first frame (bug prevention)
     if (this.firstRunFlag) {
       this.slider.scrollLeft = this.initialPosition
       this.firstRunFlag = false
     } else {
-      this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+      if (this.slider.scrollLeft < 10) {
+        this.selector.style.transform = `translateX(${this.bouncedist}px)`
+        this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+      } else if (this.slider.scrollLeft > this.slider.offsetWidth / this.mathvalue - 10) {
+        console.log('now2')
+        this.selector.style.transform = `translateX(${this.bouncedist}px)`
+        this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+      } else {
+        console.log('now')
+        this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+      }
     }
 
     window.requestAnimationFrame(this.animationFrame.bind(this))
-  }
-
-  lerp(min, max, fraction) {
-    return (max - min) * fraction + min
   }
 }
