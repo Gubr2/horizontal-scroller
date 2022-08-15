@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.2 *** //
+// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.3 *** //
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
@@ -44,7 +44,7 @@ export default class HorizontalScroller {
     this.x
     this.dist = 0
 
-    this.mathvalue = 3.3908
+    // this.mathvalue = 3.3908
   }
 
   setStyles(_selector) {
@@ -103,15 +103,15 @@ export default class HorizontalScroller {
       this.slider.scrollLeft = this.initialPosition
       this.firstRunFlag = false
     } else {
+      // Next frames
       if (this.slider.scrollLeft < 10) {
         this.selector.style.transform = `translateX(${this.bouncedist}px)`
         this.slider.scrollLeft = this.slider.scrollLeft - this.dist
-      } else if (this.slider.scrollLeft > this.slider.offsetWidth / this.mathvalue - 10) {
-        console.log('now2')
+      } else if (this.slider.scrollLeft > this.slider.scrollWidth - this.slider.offsetWidth - 10) {
         this.selector.style.transform = `translateX(${this.bouncedist}px)`
         this.slider.scrollLeft = this.slider.scrollLeft - this.dist
       } else {
-        console.log('now')
+        this.selector.style.transform = `translateX(${0}px)`
         this.slider.scrollLeft = this.slider.scrollLeft - this.dist
       }
     }
