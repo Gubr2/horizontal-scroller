@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.3 *** //
+// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.4 *** //
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
@@ -23,15 +23,28 @@ export default class HorizontalScroller {
     this.ease = _options.ease
     this.cursor = _options.cursor
     this.initialPosition = _options.initialPosition
+    this.controls = _options.controls
+
+    // ---> Arrows
+    if (this.controls) {
+      this.arrows = {
+        left: document.querySelector(_options.arrows.left),
+        right: document.querySelector(_options.arrows.right),
+        step: _options.arrows.step,
+      }
+    }
+
+    // Flags
+    this.arrowFlag = true
 
     // Init
-
     this.firstRunFlag = true
 
     if (this.selector) {
       this.setStyles(this.selector)
       this.scroll(this.selector)
       this.animationFrame()
+      this.setArrows()
     } else {
       console.warn('Horizontal Scroll: Please provide valid selector.')
     }
@@ -94,6 +107,34 @@ export default class HorizontalScroller {
     }
   }
 
+  //
+  // ARROWS
+  //
+
+  setArrows() {
+    this.arrows.left.addEventListener('click', () => {
+      this.moveWithArrows('left')
+    })
+
+    this.arrows.right.addEventListener('click', () => {
+      this.moveWithArrows('right')
+    })
+  }
+
+  moveWithArrows(_direction) {
+    if (_direction == 'left') {
+      this.dist = this.arrows.step
+      this.bouncedist = this.arrows.step
+    } else if (_direction == 'right') {
+      this.dist = -this.arrows.step
+      this.bouncedist = -this.arrows.step
+    }
+  }
+
+  //
+  // ANIMATE
+  //
+
   animationFrame() {
     this.dist *= this.ease
     this.bouncedist *= this.ease
@@ -104,15 +145,44 @@ export default class HorizontalScroller {
       this.firstRunFlag = false
     } else {
       // Next frames
+      this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+
+      // ---> Left
       if (this.slider.scrollLeft < 10) {
+        // [] Bounce
         this.selector.style.transform = `translateX(${this.bouncedist}px)`
-        this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+
+        // [] Make Arrow Inactive
+        if (this.arrowFlag) {
+          this.arrows.left.style.pointerEvents = 'none'
+          this.arrows.left.style.opacity = '0.25'
+          this.arrowFlag = false
+        }
+
+        // ---> Right
       } else if (this.slider.scrollLeft > this.slider.scrollWidth - this.slider.offsetWidth - 10) {
+        // [] Bounce
         this.selector.style.transform = `translateX(${this.bouncedist}px)`
-        this.slider.scrollLeft = this.slider.scrollLeft - this.dist
+
+        // [] Make Arrow Inactive
+        if (this.arrowFlag) {
+          this.arrows.right.style.pointerEvents = 'none'
+          this.arrows.right.style.opacity = '0.25'
+          this.arrowFlag = false
+        }
+
+        // ---> Center
       } else {
+        if (!this.arrowFlag) {
+          this.arrows.right.style.pointerEvents = 'all'
+          this.arrows.left.style.pointerEvents = 'all'
+
+          this.arrows.right.style.opacity = '1'
+          this.arrows.left.style.opacity = '1'
+        }
+        this.arrowFlag = true
+
         this.selector.style.transform = `translateX(${0}px)`
-        this.slider.scrollLeft = this.slider.scrollLeft - this.dist
       }
     }
 
