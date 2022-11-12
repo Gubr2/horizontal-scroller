@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.4 *** //
+// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.5 *** //
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
@@ -11,6 +11,7 @@
 // ---> ease [int or float] - Ease amount on the horizontal scroll
 // ---> cursor [bool] - Changes the cursor to "grab", when hovering the horizontal scroll
 // ---> initialPosition [int or float] - Sets the scroll to specified position, when initialized
+// ---> controls [bool] - Want to use arrows or not
 
 export default class HorizontalScroller {
   constructor(_options) {
@@ -44,7 +45,9 @@ export default class HorizontalScroller {
       this.setStyles(this.selector)
       this.scroll(this.selector)
       this.animationFrame()
-      this.setArrows()
+      if (this.controls) {
+        this.setArrows()
+      }
     } else {
       console.warn('Horizontal Scroll: Please provide valid selector.')
     }
@@ -154,8 +157,10 @@ export default class HorizontalScroller {
 
         // [] Make Arrow Inactive
         if (this.arrowFlag) {
-          this.arrows.left.style.pointerEvents = 'none'
-          this.arrows.left.style.opacity = '0.25'
+          if (this.controls) {
+            this.arrows.left.style.pointerEvents = 'none'
+            this.arrows.left.style.opacity = '0.25'
+          }
           this.arrowFlag = false
         }
 
@@ -166,19 +171,23 @@ export default class HorizontalScroller {
 
         // [] Make Arrow Inactive
         if (this.arrowFlag) {
-          this.arrows.right.style.pointerEvents = 'none'
-          this.arrows.right.style.opacity = '0.25'
+          if (this.controls) {
+            this.arrows.right.style.pointerEvents = 'none'
+            this.arrows.right.style.opacity = '0.25'
+          }
           this.arrowFlag = false
         }
 
         // ---> Center
       } else {
         if (!this.arrowFlag) {
-          this.arrows.right.style.pointerEvents = 'all'
-          this.arrows.left.style.pointerEvents = 'all'
+          if (this.controls) {
+            this.arrows.right.style.pointerEvents = 'all'
+            this.arrows.left.style.pointerEvents = 'all'
 
-          this.arrows.right.style.opacity = '1'
-          this.arrows.left.style.opacity = '1'
+            this.arrows.right.style.opacity = '1'
+            this.arrows.left.style.opacity = '1'
+          }
         }
         this.arrowFlag = true
 
