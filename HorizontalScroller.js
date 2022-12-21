@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.5 *** //
+// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.6 *** //
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
@@ -12,6 +12,7 @@
 // ---> cursor [bool] - Changes the cursor to "grab", when hovering the horizontal scroll
 // ---> initialPosition [int or float] - Sets the scroll to specified position, when initialized
 // ---> controls [bool] - Want to use arrows or not
+// ---> breakpoint[int or float] - Set breakpoint, where the Horizontal scroller should stop working
 
 export default class HorizontalScroller {
   constructor(_options) {
@@ -25,6 +26,7 @@ export default class HorizontalScroller {
     this.cursor = _options.cursor
     this.initialPosition = _options.initialPosition
     this.controls = _options.controls
+    this.breakpoint = _options.breakpoint
 
     // ---> Arrows
     if (this.controls) {
@@ -37,11 +39,17 @@ export default class HorizontalScroller {
 
     // Flags
     this.arrowFlag = true
+    if (this.breakpoint) {
+      this.breakpointFlag = window.innerWidth > this.breakpoint ? true : false
+    } else {
+      this.breakpointFlag = true
+    }
 
     // Init
     this.firstRunFlag = true
 
     if (this.selector) {
+      this.onResize()
       this.setStyles(this.selector)
       this.scroll(this.selector)
       this.animationFrame()
@@ -64,7 +72,7 @@ export default class HorizontalScroller {
   }
 
   setStyles(_selector) {
-    _selector.style.overflow = 'hidden'
+    _selector.style.overflowX = 'hidden'
     if (this.cursor) {
       _selector.style.cursor = 'grab'
     }
@@ -75,26 +83,32 @@ export default class HorizontalScroller {
       this.slider = _selector
 
       this.end = () => {
-        this.isDown = false
-        this.slider.classList.remove('active')
+        if (this.breakpointFlag) {
+          this.isDown = false
+          this.slider.classList.remove('active')
+        }
       }
 
       this.start = (e) => {
-        this.isDown = true
-        this.slider.classList.add('active')
-        this.startX = e.pageX || e.touches[0].pageX - this.slider.offsetLeft
-        this.scrollLeft = this.slider.scrollLeft
+        if (this.breakpointFlag) {
+          this.isDown = true
+          this.slider.classList.add('active')
+          this.startX = e.pageX || e.touches[0].pageX - this.slider.offsetLeft
+          this.scrollLeft = this.slider.scrollLeft
+        }
       }
 
       this.move = (e) => {
-        if (!this.isDown) return
+        if (this.breakpointFlag) {
+          if (!this.isDown) return
 
-        e.preventDefault()
-        this.x = e.pageX || e.touches[0].pageX - this.slider.offsetLeft
-        this.dist = (this.x - this.startX) / this.speed
-        this.bouncedist = (this.x - this.startX) / (this.speed * 1.5)
+          e.preventDefault()
+          this.x = e.pageX || e.touches[0].pageX - this.slider.offsetLeft
+          this.dist = (this.x - this.startX) / this.speed
+          this.bouncedist = (this.x - this.startX) / (this.speed * 1.5)
 
-        // this.slider.scrollLeft = this.scrollLeft - this.dist
+          // this.slider.scrollLeft = this.scrollLeft - this.dist
+        }
       }
       ;(() => {
         this.slider.addEventListener('mousedown', this.start)
@@ -131,6 +145,12 @@ export default class HorizontalScroller {
     } else if (_direction == 'right') {
       this.dist = -this.arrows.step
       this.bouncedist = -this.arrows.step
+    }
+  }
+
+  onResize() {
+    window.onresize = () => {
+      this.breakpointFlag = window.innerWidth > this.breakpoint ? true : false
     }
   }
 
