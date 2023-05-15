@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.6 *** //
+// *** HORIZONTAL SCROLLER by Adrián Gubrica, v1.7 *** //
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
@@ -53,11 +53,12 @@ export default class HorizontalScroller {
       this.setStyles(this.selector)
       this.scroll(this.selector)
       this.animationFrame()
+      this.handleLinks()
       if (this.controls) {
         this.setArrows()
       }
     } else {
-      console.warn('Horizontal Scroll: Please provide valid selector.')
+      // console.warn('Horizontal Scroll: Please provide valid selector.')
     }
 
     //
@@ -69,6 +70,20 @@ export default class HorizontalScroller {
     this.dist = 0
 
     // this.mathvalue = 3.3908
+  }
+
+  handleLinks() {
+    this.links = this.selector.querySelectorAll('a')
+
+    this.links.forEach((_link) => {
+      _link.addEventListener('click', (_e) => {
+        _e.preventDefault()
+
+        if (!this.dist) {
+          window.location.href = _e.target.href
+        }
+      })
+    })
   }
 
   setStyles(_selector) {
@@ -91,6 +106,8 @@ export default class HorizontalScroller {
 
       this.start = (e) => {
         if (this.breakpointFlag) {
+          this.dist = 0
+
           this.isDown = true
           this.slider.classList.add('active')
           this.startX = e.pageX || e.touches[0].pageX - this.slider.offsetLeft
